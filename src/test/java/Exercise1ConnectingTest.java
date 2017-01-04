@@ -1,16 +1,18 @@
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import org.hamcrest.CoreMatchers;
-import org.junit.*;
+import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 public class Exercise1ConnectingTest {
+
     @Test
     public void shouldCreateANewMongoClientConnectedToLocalhost() throws Exception {
-        // When
-        // TODO: get/create the MongoClient
         MongoClient mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
 
-        // Then
-        Assert.assertThat(mongoClient, CoreMatchers.is(CoreMatchers.notNullValue()));
+        assertThat(mongoClient, is(notNullValue()));
     }
+
 }
