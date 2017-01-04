@@ -1,11 +1,12 @@
 import com.mongodb.*;
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.UnknownHostException;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class Exercise8SkipAndLimitTest {
 
@@ -18,19 +19,17 @@ public class Exercise8SkipAndLimitTest {
         for (int i = 0; i < 20; i++) {
             collection.insert(new BasicDBObject("name", "person" + i).append("someIntValue", i));
         }
-
         // When
         DBCursor results = collection.find().skip(3).limit(7);
-
         // Then
-        Assert.assertThat(results.size(), CoreMatchers.is(7));
-        Assert.assertThat(results.next().get("someIntValue"), CoreMatchers.is(3));
-        Assert.assertThat(results.next().get("someIntValue"), CoreMatchers.is(4));
-        Assert.assertThat(results.next().get("someIntValue"), CoreMatchers.is(5));
-        Assert.assertThat(results.next().get("someIntValue"), CoreMatchers.is(6));
-        Assert.assertThat(results.next().get("someIntValue"), CoreMatchers.is(7));
-        Assert.assertThat(results.next().get("someIntValue"), CoreMatchers.is(8));
-        Assert.assertThat(results.next().get("someIntValue"), CoreMatchers.is(9));
+        assertThat(results.size(), is(7));
+        assertThat(results.next().get("someIntValue"), is(3));
+        assertThat(results.next().get("someIntValue"), is(4));
+        assertThat(results.next().get("someIntValue"), is(5));
+        assertThat(results.next().get("someIntValue"), is(6));
+        assertThat(results.next().get("someIntValue"), is(7));
+        assertThat(results.next().get("someIntValue"), is(8));
+        assertThat(results.next().get("someIntValue"), is(9));
     }
 
     @Before

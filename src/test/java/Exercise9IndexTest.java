@@ -1,11 +1,13 @@
 import com.mongodb.*;
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.UnknownHostException;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class Exercise9IndexTest {
 
@@ -16,15 +18,13 @@ public class Exercise9IndexTest {
     public void shouldCreateAnAscendingIndex() {
         // given
         collection.insert(new BasicDBObject("fieldToIndex", "Bob"));
-
         // when
         collection.createIndex(new BasicDBObject("fieldToIndex", 1));
-
         // then
         DBObject indexKey = (DBObject) collection.getIndexInfo().get(1).get("key");
-        Assert.assertTrue(indexKey.keySet().contains("fieldToIndex"));
-        Assert.assertThat(indexKey.get("fieldToIndex"), CoreMatchers.is(1));
-        Assert.assertThat(collection.getIndexInfo().get(1).get("name"), CoreMatchers.is("fieldToIndex_1"));
+        assertTrue(indexKey.keySet().contains("fieldToIndex"));
+        assertThat(indexKey.get("fieldToIndex"), is(1));
+        assertThat(collection.getIndexInfo().get(1).get("name"), is("fieldToIndex_1"));
     }
 
     @Before
