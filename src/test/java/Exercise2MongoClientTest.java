@@ -13,7 +13,7 @@ public class Exercise2MongoClientTest {
     @Test
     public void shouldGetADatabaseFromTheMongoClient() throws Exception {
         // Given
-        MongoClient mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
+        MongoClient mongoClient = MongoUtils.getMongoClient();
         // When
         DB database = mongoClient.getDB("TheDatabaseName");
         // Then
@@ -23,7 +23,7 @@ public class Exercise2MongoClientTest {
     @Test
     public void shouldGetACollectionFromTheDatabase() throws Exception {
         // Given
-        MongoClient mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
+        MongoClient mongoClient = MongoUtils.getMongoClient();
         DB database = mongoClient.getDB("TheDatabaseName");
         // When
         DBCollection collection = database.getCollection("TheCollectionName");

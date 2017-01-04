@@ -74,7 +74,7 @@ public class Exercise12UpdateMultipleDocumentsTest {
 
     @Before
     public void setUp() throws UnknownHostException {
-        MongoClient mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
+        MongoClient mongoClient = MongoUtils.getMongoClient();
         database = mongoClient.getDB("Examples");
         collection = database.getCollection("people");
     }

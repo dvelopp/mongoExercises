@@ -1,5 +1,4 @@
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -10,7 +9,7 @@ public class Exercise1ConnectingTest {
 
     @Test
     public void shouldCreateANewMongoClientConnectedToLocalhost() throws Exception {
-        MongoClient mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
+        MongoClient mongoClient = MongoUtils.getMongoClient();
 
         assertThat(mongoClient, is(notNullValue()));
     }
