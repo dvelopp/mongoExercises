@@ -1,3 +1,5 @@
+package exercises;
+
 import com.mongodb.*;
 import org.junit.After;
 import org.junit.Before;
@@ -13,13 +15,14 @@ import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class Exercise10UpdateByReplacementTest {
+public class Exercise13UpsertTest {
 
     private DB database;
     private DBCollection collection;
 
+    //Upsert
     @Test
-    public void shouldReplaceWholeDBObjectWithNewOne() {
+    public void shouldOnlyInsertDBObjectIfItDidNotExistWhenUpsertIsTrue() {
         // Given
         Person bob = new Person("bob", "Bob The Amazing", new Address("123 Fake St", "LondonTown", 1234567890),
                 asList(27464, 747854));
@@ -27,23 +30,24 @@ public class Exercise10UpdateByReplacementTest {
         Person charlie = new Person("charlie", "Charles", new Address("74 That Place", "LondonTown", 1234567890),
                 asList(1, 74));
         collection.insert(PersonAdaptor.toDBObject(charlie));
+        // new person not in the database yet
+        Person claire = new Person("claire", "Claire", new Address("1", "Town", 836558493), emptyList());
         // When
-        Person updatedCharlieObject = new Person("charlie", "Charles the Suave", new Address("A new street",
-                "GreatCity", 7654321), emptyList());
-        DBObject findCharlie = new BasicDBObject("_id", charlie.getId());
-        WriteResult resultOfUpdate = collection.update(findCharlie, PersonAdaptor.toDBObject(updatedCharlieObject));
+        DBObject findClaire = new BasicDBObject("_id", claire.getId());
+        WriteResult resultOfUpdate = collection.update(findClaire, new BasicDBObject("$set",
+                new BasicDBObject("wasUpdated", true)));
         // Then
-        assertThat(resultOfUpdate.getN(), is(1));
-
-        DBObject newCharlieDBObject = collection.find(findCharlie).toArray().get(0);
+        assertThat(resultOfUpdate.getN(), is(0));
+        // without upsert this should not have been inserted
+        assertThat(collection.find(findClaire).count(), is(0));
+        // When
+        WriteResult resultOfUpsert = collection.update(findClaire, new BasicDBObject("$set",
+                new BasicDBObject("wasUpdated", true)), true, false);
+        // Then
+        assertThat(resultOfUpsert.getN(), is(1));
+        DBObject newClaireDBObject = collection.find(findClaire).toArray().get(0);
         // all values should have been updated to the new object values
-        assertThat(newCharlieDBObject.get("_id"), is(updatedCharlieObject.getId()));
-        assertThat(newCharlieDBObject.get("name"), is(updatedCharlieObject.getName()));
-        assertThat(newCharlieDBObject.get("books"), is(updatedCharlieObject.getBookIds()));
-        DBObject address = (DBObject) newCharlieDBObject.get("address");
-        assertThat(address.get("street"), is(updatedCharlieObject.getAddress().getStreet()));
-        assertThat(address.get("city"), is(updatedCharlieObject.getAddress().getTown()));
-        assertThat(address.get("phone"), is(updatedCharlieObject.getAddress().getPhone()));
+        assertThat(newClaireDBObject.get("_id"), is(claire.getId()));
     }
 
     @Before

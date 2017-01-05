@@ -1,3 +1,5 @@
+package exercises;
+
 import com.mongodb.MongoClient;
 import org.junit.Test;
 

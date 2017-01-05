@@ -1,3 +1,5 @@
+package exercises;
+
 import com.mongodb.*;
 import org.junit.After;
 import org.junit.Before;
@@ -12,17 +14,16 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.core.IsNull.nullValue;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
-public class Exercise12UpdateMultipleDocumentsTest {
+public class Exercise14RemoveTest {
 
     private DB database;
     private DBCollection collection;
 
-    //Multi=false
     @Test
-    public void shouldOnlyUpdateTheFirstDBObjectMatchingTheQuery() {
+    public void shouldDeleteOnlyCharlieFromTheDatabase() {
         // Given
         Person bob = new Person("bob", "Bob The Amazing", new Address("123 Fake St", "LondonTown", 1234567890),
                 asList(27464, 747854));
@@ -33,21 +34,19 @@ public class Exercise12UpdateMultipleDocumentsTest {
         Person emily = new Person("emily", "Emily", new Address("5", "Some Town", 646383), emptyList());
         collection.insert(PersonAdaptor.toDBObject(emily));
         // When
-        DBObject findLondoners = new BasicDBObject("address.city", "LondonTown");
-        assertThat(collection.find(findLondoners).count(), is(2));
-        collection.update(findLondoners, new BasicDBObject("$set", new BasicDBObject("wasUpdated", true)));
+        DBObject query = new BasicDBObject("_id", charlie.getId());
+        WriteResult resultOfRemove = collection.remove(query);
         // Then
-        List<DBObject> londoners = collection.find(findLondoners).sort(new BasicDBObject("_id", 1)).toArray();
-        assertThat(londoners.size(), is(2));
-        assertThat(londoners.get(0).get("name"), is(bob.getName()));
-        assertThat(londoners.get(0).get("wasUpdated"), is(true));
-        assertThat(londoners.get(1).get("name"), is(charlie.getName()));
-        assertThat(londoners.get(1).get("wasUpdated"), is(nullValue()));
+        assertThat(resultOfRemove.getN(), is(1));
+        List<DBObject> remainingPeople = collection.find().toArray();
+        assertThat(remainingPeople.size(), is(2));
+        for (final DBObject remainingPerson : remainingPeople) {
+            assertThat(remainingPerson.get("_id"), is(not(charlie.getId())));
+        }
     }
 
-    //Multi=true
     @Test
-    public void shouldUpdateEveryoneLivingInLondon() {
+    public void shouldDeletePeopleWhoLiveInLondon() {
         // Given
         Person bob = new Person("bob", "Bob The Amazing", new Address("123 Fake St", "LondonTown", 1234567890),
                 asList(27464, 747854));
@@ -58,18 +57,13 @@ public class Exercise12UpdateMultipleDocumentsTest {
         Person emily = new Person("emily", "Emily", new Address("5", "Some Town", 646383), emptyList());
         collection.insert(PersonAdaptor.toDBObject(emily));
         // When
-        DBObject findLondoners = new BasicDBObject("address.city", "LondonTown");
-        assertThat(collection.find(findLondoners).count(), is(2));
-        collection.update(findLondoners, new BasicDBObject("$set", new BasicDBObject("wasUpdated", true)), false, true);
+        DBObject query = new BasicDBObject("address.city", "LondonTown");
+        WriteResult resultOfRemove = collection.remove(query);
         // Then
-        List<DBObject> londoners = collection.find(findLondoners).sort(new BasicDBObject("_id", 1)).toArray();
-        assertThat(londoners.size(), is(2));
-        DBObject firstLondoner = londoners.get(0);
-        assertThat(firstLondoner.get("name"), is(bob.getName()));
-        assertThat(firstLondoner.get("wasUpdated"), is(true));
-        DBObject secondLondoner = londoners.get(1);
-        assertThat(secondLondoner.get("name"), is(charlie.getName()));
-        assertThat(secondLondoner.get("wasUpdated"), is(true));
+        assertThat(resultOfRemove.getN(), is(2));
+        List<DBObject> remainingPeople = collection.find().toArray();
+        assertThat(remainingPeople.size(), is(1));
+        assertThat(remainingPeople.get(0).get("_id"), is(emily.getId()));
     }
 
     @Before

@@ -1,4 +1,4 @@
-
+package exercises;
 
 import com.mongodb.*;
 import org.junit.After;

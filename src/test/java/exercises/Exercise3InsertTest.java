@@ -1,3 +1,5 @@
+package exercises;
+
 import com.mongodb.*;
 import org.junit.Test;
 import person.Address;
